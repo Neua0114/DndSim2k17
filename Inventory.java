@@ -13,7 +13,7 @@ public class Inventory {
 	
 	//Default constructor
 	public Inventory() {
-		hpCount = 3;
+		hpCount = 1;
 		ammoCount = 15;
 		goldCount = 0;
 	}
@@ -28,16 +28,10 @@ public class Inventory {
 		return hpCount;
 	}
 	
-	//[WIP] Function to heal
-	public int heal(int curHealth, int maxHealth) {
-		if (hpCount >= 0) {
-			hpCount--;
-			int hp = maxHealth - curHealth;
-			return hp;
-		}
-		else {
-			return 0;
-		}
+	//Function to heal
+	public int heal() {
+		hpCount--;
+			return Roll.Roller(4) + Roll.Roller(4) + 2;
 	}
 
 }
