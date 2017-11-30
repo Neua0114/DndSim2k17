@@ -14,6 +14,7 @@ public class FighterChar extends Creature {
 		int MAXHEALTH = 12;
 		int AC = 18;
 		int MOVESPEED = 35;
+		MeleeAI controlAi;
 		
 		
 		
@@ -25,7 +26,7 @@ public class FighterChar extends Creature {
 		
 		//Constructor which sets the statistics of the fighter
 		public FighterChar(String charName){
-			this.charName = charName;
+			this.setName(charName);
 			str = STR;
 			dex = DEX;
 			con = CON;
@@ -36,6 +37,7 @@ public class FighterChar extends Creature {
 			ac = AC;
 			movespeed = MOVESPEED;
 			
+			controlAi = new MeleeAI(this);
 		}
 			
 			
