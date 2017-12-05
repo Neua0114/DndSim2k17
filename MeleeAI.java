@@ -24,32 +24,45 @@ public class MeleeAI {
 		this.hasMoved = false;
 	}
 	
-	//Method to move the Creature one turn's amount of movement
-	public void turnMovement(int moveSpeed, int enemyXPos, int enemyYPos) {
+	//Method to move the Creature one turn's amount of movement and attack if able
+	public void turnMovement(int moveSpeed, int enemyXPos, int enemyYPos, Creature enemy) {
 		int moveAmount = moveSpeed;
-		
-		while (moveAmount != 0) {
-			if (this.yPos < enemyYPos - 1) {
-				this.yPos += 1;
-				moveAmount -= 5;
-				System.out.println( this.attachedCreature.getName() + " has moved 5 feet towards the enemy");
-			} else if (this.yPos > enemyYPos + 1) {
-				this.yPos -= 1;
-				moveAmount -= 5;
-				System.out.println( this.attachedCreature.getName() + " has moved 5 feet towards the enemy");
-			} else if ((this.yPos == enemyYPos + 1 || this.yPos == enemyYPos - 1) && this.xPos < enemyXPos) {
-				this.xPos += 1;
-				moveAmount -= 5;
-				System.out.println( this.attachedCreature.getName() + " has moved 5 feet towards the enemy");
-			} else if ((this.yPos == enemyYPos + 1 || this.yPos == enemyYPos - 1) && this.xPos > enemyXPos) {
-				this.xPos -= 1;
-				moveAmount -= 5;
-				System.out.println( this.attachedCreature.getName() + " has moved 5 feet towards the enemy");
-			}else {
-				System.out.println( this.attachedCreature.getName() + " is next to the enemy");
+		hasAttacked = false;
+		while (moveAmount != 0 || hasAttacked == false) {
+			//checks to see if adjacent to an enemy
+			if (((this.xPos == enemyXPos - 1 || this.xPos == enemyXPos + 1) && this.yPos == enemyYPos) || 
+					((this.yPos == enemyYPos + 1 || this.yPos == enemyYPos - 1) && this.xPos == enemyXPos)) {
+				attachedCreature.attack(enemy);
 				moveAmount = 0;
+				hasAttacked = true;
+				System.out.println(this.attachedCreature.getName() + "has attacked " + enemy.getName());
+			//otherwise move like normal
+			}else {	
+				if (this.yPos < enemyYPos - 1) {
+					this.yPos += 1;
+					moveAmount -= 5;
+					System.out.println( this.attachedCreature.getName() + " has moved 5 feet towards the enemy");
+				} else if (this.yPos > enemyYPos + 1) {
+					this.yPos -= 1;
+					moveAmount -= 5;
+					System.out.println( this.attachedCreature.getName() + " has moved 5 feet towards the enemy");
+				} else if ((this.yPos == enemyYPos + 1 || this.yPos == enemyYPos - 1) && this.xPos < enemyXPos) {
+					this.xPos += 1;
+					moveAmount -= 5;
+					System.out.println( this.attachedCreature.getName() + " has moved 5 feet towards the enemy");
+				} else if ((this.yPos == enemyYPos + 1 || this.yPos == enemyYPos - 1) && this.xPos > enemyXPos) {
+					this.xPos -= 1;
+					moveAmount -= 5;
+					System.out.println( this.attachedCreature.getName() + " has moved 5 feet towards the enemy");
+				}else {
+					System.out.println( this.attachedCreature.getName() + " is finished moving");
+					moveAmount = 0;
+					hasAttacked = true;
+				}
 			}
 		}
+		
+		//Prints out the final x and y position of the character
 		System.out.println(this.xPos + " x position");
 		System.out.println(this.yPos + " y position");
 	}
