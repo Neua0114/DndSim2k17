@@ -35,7 +35,7 @@ public class MeleeAI {
 				attachedCreature.attack(enemy);
 				moveAmount = 0;
 				hasAttacked = true;
-				System.out.println(this.attachedCreature.getName() + "has attacked " + enemy.getName());
+				System.out.println(this.attachedCreature.getName() + " has attacked " + enemy.getName());
 			//otherwise move like normal
 			}else {	
 				if (this.yPos < enemyYPos - 1) {
