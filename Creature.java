@@ -18,6 +18,8 @@ public class Creature {
 	int healStr = 0;
 	int sneakAttackCount = 0;
 	int playerLvl = 1;
+	
+	Inventory I = new Inventory();
 
 
 	
@@ -88,6 +90,11 @@ public class Creature {
 	//Returns the movement speed of each creature
 	public int getMoveSpeed() {
 		return movespeed;
+	}
+	
+	//Function to heal by health potion
+	public void healthPotion() {
+		beHealed(I.heal());		
 	}
 	
 
