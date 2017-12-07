@@ -5,6 +5,6 @@ public class Roll {
         random=random +1;
         int i= (int) random;
         i = i % size;
-        return i;
+        return i+1;
     }
 }
