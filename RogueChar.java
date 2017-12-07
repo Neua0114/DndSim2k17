@@ -11,13 +11,16 @@ public class RogueChar extends Creature {
 		int MAXHEALTH = 8;
 		int AC = 14;
 		int MOVESPEED = 25;
+		int HP = 8;
 		
 	//Other Instance Variables
 		String charName;
+		Boolean lucky = false;
+		
 
 		//Constructor which sets the statistics of the rogue.
 		RogueChar(String charName){
-			this.charName = charName;
+			this.setName(charName);
 			str = STR;
 			dex = DEX;
 			con = CON;
@@ -27,6 +30,7 @@ public class RogueChar extends Creature {
 			maxHealth = MAXHEALTH;
 			ac = AC;
 			movespeed = MOVESPEED;
+			hp = HP;
 		}
 		
 		//Speaking function
@@ -38,14 +42,16 @@ public class RogueChar extends Creature {
 			System.out.println("Intelligence: " + intel);
 			System.out.println("Wisdom: " + wis);
 			System.out.println("Charisma: " + cha);
-			System.out.println("Health Points: " + maxHealth);
+			System.out.println("Health Points: " + hp);
 			System.out.println("Armor Class: " + ac);
 		}
 		
+		//The roll for the order of the rogue's respective turn in the simulator
 		public int Initiative() {
 			int roll1 = Roll.Roller(20);
 			return roll1 + dex;
 		}
+		
 		
 		//function for attacking a monster with the calculated attackStr.
 		public void attack(Creature opponent) {
@@ -57,7 +63,21 @@ public class RogueChar extends Creature {
 				int daggerAttack = Roll.Roller(20) + 3;
 				int sneakAttack = Roll.Roller(6);
 				
-				//Shortsword Attack + sneak attack loop
+				
+				
+				//Lucky function
+				if(!lucky && swordAttack == 6) {
+					lucky = true;
+					swordAttack = Roll.Roller(20) + 5;
+				}
+				if(!lucky && daggerAttack == 6) {
+					lucky = true;
+					daggerAttack = Roll.Roller(20) + 5;
+				}
+				
+				
+				
+				//Short sword Attack + sneak attack loop
 				if(swordAttack > opponent.ac && sneakAttackCount ==0) {
 					attackStr = Roll.Roller(6) + 3;
 					System.out.println("You have hit your opponent!");
@@ -80,6 +100,8 @@ public class RogueChar extends Creature {
 					System.out.println("You have missed the opponent with the shortsword.");
 				}
 				
+				
+				
 				//Dagger attack + sneak attack loop
 				if(daggerAttack >= opponent.ac && sneakAttackCount == 0) {
 					attackStr = Roll.Roller(4) + 3;
@@ -99,6 +121,7 @@ public class RogueChar extends Creature {
 					System.out.println("Attacking" + "with my dagger.");
 					opponent.beAttacked(attackStr);
 				}
+				
 				else {
 					System.out.println("You have missed the opponent with the dagger.");
 				}

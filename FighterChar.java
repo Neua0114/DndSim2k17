@@ -14,7 +14,7 @@ public class FighterChar extends Creature {
 		int MAXHEALTH = 12;
 		int AC = 18;
 		int MOVESPEED = 35;
-		MeleeAI controlAi;
+		int HP = 12;
 		
 		
 		
@@ -36,8 +36,8 @@ public class FighterChar extends Creature {
 			maxHealth = MAXHEALTH;
 			ac = AC;
 			movespeed = MOVESPEED;
+			hp = HP;
 			
-			controlAi = new MeleeAI(this);
 		}
 			
 			
@@ -50,7 +50,7 @@ public class FighterChar extends Creature {
 				System.out.println("Intelligence: " + intel);
 				System.out.println("Wisdom: " + wis);
 				System.out.println("Charisma: " + cha);
-				System.out.println("Health Points: " + maxHealth);
+				System.out.println("Health Points: " + hp);
 				System.out.println("Armor Class: " + ac);
 			}
 			
@@ -101,13 +101,20 @@ public class FighterChar extends Creature {
 				if(stamina >= 1) {
 					heal = playerLvl + num;
 					System.out.println("Healing for: " + heal);
-					maxHealth = maxHealth + heal;
+					hp = hp + heal;
+					stamina--;
+					System.out.println("Stamina is: " + stamina);
+				}
+				else {
+					System.out.println("You have already used SecondWind.");
 				}
 				
-				if((maxHealth += playerLvl + num) > 12) {
-					maxHealth = 12;
-					System.out.println("Your new max health is maxed at: " + maxHealth);
+				if(hp > 12) {
+					hp = maxHealth;
+					System.out.println("Your new health is maxed at: " + maxHealth);
 				}
+				
+				
 				
 				
 			}
