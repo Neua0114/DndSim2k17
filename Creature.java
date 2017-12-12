@@ -210,6 +210,24 @@ public class Creature {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	//Function to heal by health potion
+	public void healthPotion() {
+		beHealed(I.heal());		
+	}
+	//Function to use ammo
+	public void consumeAmmo(int type) {
+		if (I.hasAmmo(type)) {
+			I.useAmmo(type);;
+		}
+		else{
+			System.out.println("No Ammo");
+		}
+	}
+	//Function to add or subtract from the ammo directly
+	public void adjustAmmo(int type, int count) {
+		I.addAmmo(type, count)
+	}
 
 
 }
