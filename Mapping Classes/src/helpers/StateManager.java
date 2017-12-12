@@ -3,92 +3,97 @@ package helpers;
 import static helpers.Artist.BeginSession;
 import static helpers.Artist.HEIGHT;
 import static helpers.Artist.QuickLoad;
-import static helpers.Artist.SCALE;
-import static helpers.Artist.WIDTH;
+import static helpers.Artist.*;
 
-import org.lwjgl.input.Keyboard;
+import java.util.ArrayList;
+
+//import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import data.Editor;
 import data.Entity;
+import data.EntityType;
 import data.TileGrid;
 import gui.EditSelect;
+import gui.Load;
 import gui.MainMenu;
+import gui.Scale;
 
 public class StateManager {
 	
 	//Custom variable for the current state of the game
 	public static enum State {
-		MENU, SIMULATION, EDITOR
+		LOAD, SCALE, MENU, SIMULATION, EDITOR
 	}
 	
 	public static State state = State.MENU;
 	public static MainMenu menu = new MainMenu();
+	public static Scale scale = new Scale();
+	public static Load load = new Load();
 	public static boolean start = false;
-	
-	private static Entity[] entities;
-	private static TileGrid grid;
+	public static int[][] map ;
+	public static int mapWidth;
+	public static int mapHeight;
+	public static ArrayList<Entity> monster = new ArrayList<Entity>();
+	public static ArrayList<Entity> character = new ArrayList<Entity>();
+	public static TileGrid grid;
 	private static Editor editor;
-	private static int entityTurn = 0;
 	private static boolean leftMouseDown = false;
-	private static int mode = 0;
 	public static boolean toggle = true;
+	
+	//0 = Tile 1 = Characters 2 = Monsters
+	public static int editing;
+	public static int characterIndex = 0;
+	public static int monsterIndex = 0;
+	public static EntityType curType;
 	
 	public static void Update() {
 		
 		//Check the state of the game
 		switch(state) {
+		case SCALE:
+			
+			
+			grid = new TileGrid(map);
+			editor = new Editor(grid);
+			
+			//Sets the open menu to visible
+			if (!scale.isVisible()) {
+				scale.setVisible(true);
+
+			}
+			break;
+			
+		case LOAD:
+			//Sets the open menu to visible
+			if (!load.isVisible()) {
+				load.setVisible(true);
+
+			}
+			break;
+		
 		case MENU:
+			//BeginSession();
+			//window.setVisible(false);
 			//Sets the open menu to visible
 			if (!menu.isVisible()) {
 				menu.setVisible(true);
 
 			}
+			
 			break;
+			
+			
 			
 		case SIMULATION:
 			//Remove menu
 			menu.setVisible(false);
 			
-			//Runs the first initiation to create the session, map, grid, and Entities array
-			if (!start) {
-				BeginSession();
-				start = true;
-				
-				int[][] map = new int[WIDTH/SCALE][HEIGHT/SCALE];
-				for(int i=0;i<WIDTH/SCALE - 1;i++) {
-					for(int j=0;j<HEIGHT/SCALE - 1;j++) {
-					
-						map[i][j] = 0;
-					
-					}
-				}
 			
 			
-				grid = new TileGrid(map);
-				entities = new Entity[1];
-				entities[0] = new Entity(QuickLoad("Orc"), grid.GetTile(5,5), grid, SCALE, SCALE);
-			}
 			
-			//Waits for input from Keys, will wait for input from AI
-			while(Keyboard.next()) {
-				if (Keyboard.getEventKey() == Keyboard.KEY_D && Keyboard.getEventKeyState()){
-					entities[entityTurn].moveEast();
-				}
-				if (Keyboard.getEventKey() == Keyboard.KEY_A && Keyboard.getEventKeyState()){
-					entities[entityTurn].moveWest();
-				}
-				if (Keyboard.getEventKey() == Keyboard.KEY_W && Keyboard.getEventKeyState()){
-					entities[entityTurn].moveNorth();
-				}
-				if (Keyboard.getEventKey() == Keyboard.KEY_S && Keyboard.getEventKeyState()){
-					entities[entityTurn].moveSouth();
-				}
-			}
 			
-			//Draws the grid and Entities on the map
-			DrawGrid();
-			DrawEntities();
+			
 			break;
 			
 		case EDITOR:
@@ -98,21 +103,36 @@ public class StateManager {
 			//Runs first initiation
 			if (!start) {
 				BeginSession();
+				updateDisplay();
 				start = true;
-				
-				int[][] map = new int[WIDTH/SCALE][HEIGHT/SCALE];
-				for(int i=0;i<WIDTH/SCALE - 1;i++) {
-					for(int j=0;j<HEIGHT/SCALE - 1;j++) {
+			
+				map = new int[mapWidth][mapHeight];
+				for(int i=0;i<mapWidth;i++) {
+					for(int j=0;j<mapHeight;j++) {
 					
-						map[i][j] = 0;
-					
+						if (i == 0 && j == 0) {
+							map[i][j] = 1;
+						}else if (i == 0 && j == mapHeight-1) {
+							map[i][j] = 3;
+						}else if (i == mapWidth-1 && j == 0) {
+							map[i][j] = 2;
+						}else if (i == mapWidth-1 && j == mapHeight-1) {
+							map[i][j] = 4;
+						}else if (i == 0) {
+							map[i][j] = 8;
+						}else if (i == mapWidth-1) {
+							map[i][j] = 6;
+						}else if (j == 0) {
+							map[i][j] = 5;
+						}else if (j == mapHeight-1) {
+							map[i][j] = 7;
+						}else {
+							map[i][j] = 0;
+						}	
 					}
 				}
-			
-			
 				grid = new TileGrid(map);
 				editor = new Editor(grid);
-				
 				//Creates the edit menu
 				EditSelect editMenu = new EditSelect();
 				editMenu.setEdit(editor);
@@ -120,16 +140,52 @@ public class StateManager {
 
 			}
 			
+			
+			
 			//Checks if the button is click and changes tile
-			if(Mouse.isButtonDown(0)) {
-				editor.setTile();
+			if(Mouse.isButtonDown(0) && !leftMouseDown) {
+				if (editing == 0)
+					editor.Draw();
+				else if (editing == 1) {
+					if(!grid.GetTile((int) Math.floor(Mouse.getX()/SCALE), (int) Math.floor((HEIGHT - Mouse.getY() - 1)/SCALE)).getOccupied()) {
+						character.add(new Entity(QuickLoad(curType.textureName), grid.GetTile((int) Math.floor(Mouse.getX()/SCALE), (int) Math.floor((HEIGHT - Mouse.getY() - 1)/SCALE)), curType));
+						characterIndex++;
+					}
+				}
+				else if(editing == 2) {
+					if(!grid.GetTile((int) Math.floor(Mouse.getX()/SCALE), (int) Math.floor((HEIGHT - Mouse.getY() - 1)/SCALE)).getOccupied()) {
+						monster.add(new Entity(QuickLoad(curType.textureName), grid.GetTile((int) Math.floor(Mouse.getX()/SCALE), (int) Math.floor((HEIGHT - Mouse.getY() - 1)/SCALE)), curType));
+						monsterIndex++;
+					}
+				}
+				else if(editing == 3) {
+				
+					if(grid.GetTile((int) Math.floor(Mouse.getX()/SCALE), (int) Math.floor((HEIGHT - Mouse.getY() - 1)/SCALE)).getOccupied()) {
+						for(int i = 0; i< character.size(); i++) {
+							if(character.get(i).getLocation() == grid.GetTile((int) Math.floor(Mouse.getX()/SCALE), (int) Math.floor((HEIGHT - Mouse.getY() - 1)/SCALE))) {
+								character.remove(i);
+								grid.GetTile((int) Math.floor(Mouse.getX()/SCALE), (int) Math.floor((HEIGHT - Mouse.getY() - 1)/SCALE)).changeOccupied();
+							}
+						}
+						for(int i = 0; i< monster.size(); i++) {
+							if(monster.get(i).getLocation() == grid.GetTile((int) Math.floor(Mouse.getX()/SCALE), (int) Math.floor((HEIGHT - Mouse.getY() - 1)/SCALE))) {
+								monster.remove(i);
+								grid.GetTile((int) Math.floor(Mouse.getX()/SCALE), (int) Math.floor((HEIGHT - Mouse.getY() - 1)/SCALE)).changeOccupied();
+							}
+						}
+						
+					}
+				}
+				
+				
+				
 			}
 			leftMouseDown = Mouse.isButtonDown(0);
 			
 		
 			//Draws the grid
 			DrawGrid();
-				
+			DrawEntities();
 			break;
 		
 		}
@@ -142,8 +198,15 @@ public class StateManager {
 	
 	//Draws all entities in array
 	public static void DrawEntities() {
-		for(int i=0; i<entities.length; i++) {
-			entities[i].Draw();
+		for(int i=0; i<monster.size(); i++) {
+			monster.get(i).setUpTexture();
+			monster.get(i).setOccupied();
+			monster.get(i).Draw();
+		}
+		for(int i=0; i<character.size(); i++) {
+			character.get(i).setUpTexture();
+			character.get(i).setOccupied();
+			character.get(i).Draw();
 		}
 	}
 	
@@ -155,5 +218,12 @@ public class StateManager {
 			toggle = true;
 	}
 	
-	
+	//Toggle variable for action waiting
+	public static void setEditing(int num) {
+			editing = num;
+	}
+		
+	public static void createGrid() {
+		grid = new TileGrid(map);
+	}
 }

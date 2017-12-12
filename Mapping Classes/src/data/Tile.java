@@ -5,23 +5,27 @@ import static helpers.Artist.*;
 
 public class Tile {
 
-	private float x, y, width, height;
+	private float x, y;
 	private Texture texture;
 	private TileType type;
 	private boolean isOccupied = false;
 	
-	public Tile(float x, float y, float width, float height, TileType type) {
+	public Tile(float x, float y, TileType type) {
 		this.x = x;
 		this.y = y;
-		this.width = width;
-		this.height = height;
 		this.type = type;
 		this.texture = QuickLoad(type.textureName);
 	}
 	
+	public Tile(float x, float y) {
+		this.x = x;
+		this.y = y;
+
+	}
+	
 	//Draw the Tile
 	public void Draw() {
-		DrawQuadTex(texture,x,y,width,height);
+		DrawQuadTex(texture,x,y,SCALE,SCALE);
 	}
 	
 	public float getX() {
@@ -38,22 +42,6 @@ public class Tile {
 
 	public void setY(float y) {
 		this.y = y;
-	}
-
-	public float getWidth() {
-		return width;
-	}
-
-	public void setWidth(float width) {
-		this.width = width;
-	}
-
-	public float getHeight() {
-		return height;
-	}
-
-	public void setHeight(float height) {
-		this.height = height;
 	}
 
 	public Texture getTexture() {

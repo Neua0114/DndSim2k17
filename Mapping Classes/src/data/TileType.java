@@ -11,7 +11,10 @@ public enum TileType {
 	WallNorth("WallNorth",false,true,true,true),
 	WallSouth("WallSouth",true,false,true,true),
 	WallEast("WallEast",true,true,false,true),
-	WallWest("WallWest",true,true,true,false);
+	WallWest("WallWest",true,true,true,false),
+	HallEastWest("HallEastWest",true,true,false,false),
+	HallNorthSouth("HallNorthSouth",false,false,true,true);
+	
 	
 	String textureName;
 	boolean walkNorth;

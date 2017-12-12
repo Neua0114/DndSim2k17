@@ -1,59 +1,64 @@
 package data;
 import static helpers.Artist.*;
+import static helpers.StateManager.*;
 public class TileGrid {
 	
 	public Tile[][] map;
-	private int scale;
-	private int width;
-	private int height;
+
 	public TileGrid() {
-		map = new Tile[width/scale][height/scale];
+		map = new Tile[mapWidth][mapHeight];
 		for(int i = 0; i <map.length;i++) {
 			for(int j = 0; j< map[i].length; j++) {
 				
-				map[i][j] = new Tile(i *scale, j*scale, scale,scale, TileType.Floor);
+				map[i][j] = new Tile(i *SCALE, j*SCALE, TileType.Floor);
 				
 			}
 		}
 	}
 	
 	public TileGrid(int[][] newMap) {
-		this.scale = SCALE;
-		this.width = WIDTH;
-		this.height = HEIGHT;
+
 		
 		//Create the new Tile map 
-		map = new Tile[width/scale][height/scale];
+		map = new Tile[mapWidth][mapHeight];
 		for(int i = 0; i <map.length;i++) {
 			for(int j = 0; j< map[i].length; j++) {
 
-				switch(newMap[j][i]) {
+				switch(newMap[i][j]) {
 				case 0:
-					map[i][j] = new Tile(i *scale, j*scale, scale,scale, TileType.Floor);
+					map[i][j] = new Tile(i *SCALE, j*SCALE, TileType.Floor);
 					break;
 				case 1: 
-					map[i][j] = new Tile(i *scale, j*scale, scale,scale, TileType.CornerNorthWest);
+					map[i][j] = new Tile(i *SCALE, j*SCALE, TileType.CornerNorthWest);
 					break;
 				case 2: 
-					map[i][j] = new Tile(i *scale, j*scale, scale,scale, TileType.CornerNorthEast);				
+					map[i][j] = new Tile(i *SCALE, j*SCALE, TileType.CornerNorthEast);				
 					break;
 				case 3: 
-					map[i][j] = new Tile(i *scale, j*scale, scale,scale, TileType.CornerSouthWest);
+					map[i][j] = new Tile(i *SCALE, j*SCALE, TileType.CornerSouthWest);
 					break;
 				case 4: 
-					map[i][j] = new Tile(i *scale, j*scale, scale,scale, TileType.CornerSouthEast);
+					map[i][j] = new Tile(i *SCALE, j*SCALE, TileType.CornerSouthEast);
 					break;
 				case 5: 
-					map[i][j] = new Tile(i *scale, j*scale, scale,scale, TileType.WallNorth);
+					map[i][j] = new Tile(i *SCALE, j*SCALE, TileType.WallNorth);
 					break;
 				case 6: 
-					map[i][j] = new Tile(i *scale, j*scale, scale,scale, TileType.WallEast);
+					map[i][j] = new Tile(i *SCALE, j*SCALE, TileType.WallEast);
 					break;
 				case 7: 
-					map[i][j] = new Tile(i *scale, j*scale, scale,scale, TileType.WallSouth);
+					map[i][j] = new Tile(i *SCALE, j*SCALE, TileType.WallSouth);
 					break;
 				case 8: 
-					map[i][j] = new Tile(i *scale, j*scale, scale,scale, TileType.WallWest);
+					map[i][j] = new Tile(i *SCALE, j*SCALE, TileType.WallWest);
+					break;
+					
+				case 9: 
+					map[i][j] = new Tile(i *SCALE, j*SCALE, TileType.HallEastWest);
+					break;
+					
+				case 10: 
+					map[i][j] = new Tile(i *SCALE, j*SCALE, TileType.HallNorthSouth);
 					break;
 				
 				}
@@ -70,7 +75,7 @@ public class TileGrid {
 			for(int j = 0; j< map[i].length; j++) {
 				
 				Tile t = map[i][j];
-				DrawQuadTex(t.getTexture(),t.getX(), t.getY(), t.getWidth(), t.getHeight());
+				DrawQuadTex(t.getTexture(),t.getX(), t.getY(), SCALE, SCALE);
 				
 			}
 		}
@@ -78,7 +83,7 @@ public class TileGrid {
 	
 	//Set the current tile
 	public void SetTile(int xCoord, int yCoord, TileType type) {
-		map[xCoord][yCoord] = new Tile(xCoord *scale, yCoord * scale, scale,scale, type);
+		map[xCoord][yCoord] = new Tile(xCoord *SCALE, yCoord * SCALE, type);
 	}
 	
 	//Get tile using int

@@ -2,23 +2,31 @@ package gui;
 
 import static helpers.Artist.setDimensions;
 
-import java.awt.EventQueue;
+import static helpers.StateManager.*;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import java.awt.GridBagLayout;
-import javax.swing.JLabel;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
-import javax.swing.JRadioButton;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JTextField;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+import data.Boot;
+
+import helpers.StateManager.State;
+
+@SuppressWarnings("serial")
 public class Scale extends JFrame {
 
 	private JPanel contentPane;
@@ -46,7 +54,7 @@ public class Scale extends JFrame {
 	 */
 	public Scale() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 323, 109);
+		setBounds(100, 100, 323, 114);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -145,7 +153,10 @@ public class Scale extends JFrame {
 	        		  scale = 64;
 	        	  
 	        	  setDimensions(width*scale, height*scale, scale);
-	        	  
+	        	  mapWidth = width;
+	        	  mapHeight = height;
+	        	  state = State.EDITOR;
+	        	  Boot.toggleRun();
 	        	  dispose();
 	          }
 	        });

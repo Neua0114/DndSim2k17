@@ -20,6 +20,7 @@ public class Boot {
 				
 		}
 		
+		StateManager.Update();
 		
 		//Main run for actions
 		while(!Display.isCloseRequested())
