@@ -216,17 +216,15 @@ public class Creature {
 		beHealed(I.heal());		
 	}
 	//Function to use ammo
-	public void consumeAmmo(int type) {
-		if (I.hasAmmo(type)) {
-			I.useAmmo(type);;
-		}
-		else{
-			System.out.println("No Ammo");
-		}
+	public boolean hasAmmo(int type) {
+		return I.hasAmmo(type);
+	}
+	public void useAmmo(int type) {
+		I.useAmmo(type);
 	}
 	//Function to add or subtract from the ammo directly
 	public void adjustAmmo(int type, int count) {
-		I.addAmmo(type, count)
+		I.addAmmo(type, count);
 	}
 
 
