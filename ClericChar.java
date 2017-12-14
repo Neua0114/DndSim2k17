@@ -1,6 +1,9 @@
 
 public class ClericChar extends Creature {
 	
+	
+	String utilityArray[] = {"heal", "ShielfOfFaith"};
+	String meleeCombatArray[] = {"Inflict Wounds"};
 	//Instance Variables
 			int STR = 3;
 			int DEX = -1;

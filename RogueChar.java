@@ -1,6 +1,8 @@
 
 public class RogueChar extends Creature {
 	
+	
+	String utilityArray[] = {"agileMovement"};
 	//Instance Variables
 		int STR = 0;
 		int DEX = 3;
