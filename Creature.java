@@ -2,10 +2,14 @@
 
 package d20battler;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Random;
+
 public class Creature {
 
 	//Member Variables
-		int id;
+	int id;
 	int mapsize;
 	int x;
 	int y;
@@ -24,6 +28,8 @@ public class Creature {
 	Creature attachedCreature;
 	Boolean hasAttacked;
 	Boolean hasMoved;
+	Boolean isRanged = false;
+	int range = 75;
 	
 	Creature[] targetList;
 	Creature target;
@@ -69,37 +75,74 @@ public class Creature {
 		hasAttacked = false;
 		while (moveAmount != 0 || hasAttacked == false) {
 			//checks to see if adjacent to an enemy
-			if (((this.getX() == target.getX() - 1 || this.getX() == target.getX() + 1) && this.getY() == target.getY()) || 
-					((this.getY() == target.getY() + 1 || this.getY() == target.getY() - 1) && this.getX() == target.getX())) {
+			if ((((this.getX() == target.getX() - 1 || this.getX() == target.getX() + 1) && this.getY() == target.getY()) || 
+					((this.getY() == target.getY() + 1 || this.getY() == target.getY() - 1) && this.getX() == target.getX())) || isRangedAttack(target.getX(), target.getY())) {
 				this.attack(enemy);
 				moveAmount = 0;
 				hasAttacked = true;
 				System.out.println(this.getId() + " has attacked " + target.getId());
 			//otherwise move like normal
-			}else {	
-				if (this.getY() < target.getY() - 1) {
-					move(0,1);
-					moveAmount -= 5;
-					System.out.println( this.getId() + " has moved 5 feet towards the enemy");
-				} else if (this.getY() > target.getY() + 1) {
-					move(0,-1);
-					moveAmount -= 5;
-					System.out.println( this.getId() + " has moved 5 feet towards the enemy");
-				} else if ((this.getY() == target.getY() + 1 || this.getY() == target.getY() - 1) && this.getX() < target.getX()) {
-					move(1,0);
-					moveAmount -= 5;
-					System.out.println( this.getId() + " has moved 5 feet towards the enemy");
-				} else if ((this.getY() == target.getY() + 1 || this.getY() == target.getY() - 1) && this.getX() > target.getX()) {
-					move(-1,0);
-					moveAmount -= 5;
-					System.out.println( this.getId() + " has moved 5 feet towards the enemy");
+			}else {
+				if (!isRanged) {
+					if (moveAmount > 0) {
+	 					if (this.getY() < target.getY() - 1) {
+							move(0,1);
+							moveAmount -= 5;
+							System.out.println( this.getId() + " has moved 5 feet towards the enemy");
+						} else if (this.getY() > target.getY() + 1) {
+							move(0,-1);
+							moveAmount -= 5;
+							System.out.println( this.getId() + " has moved 5 feet towards the enemy");
+						} else if ((this.getY() == target.getY() + 1 || this.getY() == target.getY() - 1) && this.getX() < target.getX()) {
+							move(1,0);
+							moveAmount -= 5;
+							System.out.println( this.getId() + " has moved 5 feet towards the enemy");
+						} else if ((this.getY() == target.getY() + 1 || this.getY() == target.getY() - 1) && this.getX() > target.getX()) {
+							move(-1,0);
+							moveAmount -= 5;
+							System.out.println( this.getId() + " has moved 5 feet towards the enemy");
+						}else {
+							System.out.println( this.getId() + " is finished moving");
+							moveAmount = 0;
+							hasAttacked = true;
+						}
+					}else {
+						moveAmount = 0;
+						this.hasAttacked = true;
+					}
 				}else {
-					System.out.println( this.getId() + " is finished moving");
-					moveAmount = 0;
-					hasAttacked = true;
+					if (moveAmount > 0) {
+						if (this.getY() < target.getY() - 1 && !isRangedAttack(target.getX(), target.getY())) {
+							move(0,1);
+							System.out.println( this.attachedCreature.getName() + " has moved 5 y feet towards the enemy");
+							moveAmount -= 5;
+						} else if (this.getY() > target.getY() + 1 && !isRangedAttack(target.getX(), target.getY())) {
+							move(0,-1);
+							System.out.println( this.attachedCreature.getName() + " has moved -5 y feet towards the enemy");
+							moveAmount -= 5;
+						} else if (((this.getY() == target.getY() + 1 || this.getY() == target.getY() - 1) && this.getX() < target.getX()) && !isRangedAttack(target.getX(), target.getY())) {
+							move(1,0);
+							System.out.println( this.attachedCreature.getName() + " has moved 5 x feet towards the enemy");
+							moveAmount -= 5;
+						} else if (((this.getY() == target.getY() + 1 || this.getY() == target.getY() - 1) && this.getX() > target.getX()) && !isRangedAttack(target.getX(), target.getY())) {
+							move(-1,0);
+							System.out.println( this.attachedCreature.getName() + " has moved -5 x feet towards the enemy");
+							moveAmount -= 5;
+						}else if (isRangedAttack(target.getX(), target.getY())) {
+							System.out.println(this.attachedCreature.getName() + " is within Range");
+							moveAmount = 0;
+						}else {
+							System.out.println( this.attachedCreature.getName() + " is finished moving");
+							this.hasAttacked = true;
+							moveAmount = 0;
+						}
+					}else {
+						this.hasAttacked = true;
+					}
 				}
-			}}
+			}
 		}
+	}
 	
 	//Moves a creature to a given square x and y units away.  
 	public void move(int x, int y)	{
@@ -116,6 +159,35 @@ public class Creature {
 	else
 		this.setY(this.getY() + y);
 	}
+	
+	//Method for using abilities of class
+		public void useAttackAbility(String[] mAbilities, Creature enemy) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+			int sizeArra = mAbilities.length;
+			Random rand = new Random();
+			int value = rand.nextInt(sizeArra);
+			
+			Method method = this.attachedCreature.getClass().getMethod(mAbilities[value], Creature.class);
+			method.invoke(this.attachedCreature, enemy);
+		}
+		
+		//Method to check if the character is ranged and in range 
+		//returns moveAmount remaining
+		public Boolean isRangedAttack(int enemyXPos, int enemyYPos) {
+				if (this.isRanged) {
+					//checks if in range
+					if ((this.getX() == enemyXPos && (Math.abs(this.getY() - enemyYPos) * 5) <= this.range) || 
+							(this.getY() == enemyYPos && (Math.abs(this.getX() - enemyXPos) * 5) <= this.range)) {
+						return true;
+					}else {
+						return false;
+					}
+				}
+			return false;
+		}
+		
+		public void setRange() {
+			this.isRanged = true;
+		}
 	
 	//Function that attacks an opponent
 	public void attack(Creature opponent) {
