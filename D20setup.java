@@ -9,12 +9,15 @@ public class D20setup {
 	static char[][] map;
 	static Creature[] units1;
 	static Creature[] units2;
+	static int unitsRemaining1;
+	static int unitsRemaining2;
+	static Creature[] targetableUnits1;
+	static Creature[] targetableUnits2;
 	static int[][] initiative;
 	static int initCounter;
 	static int mapsize;
 	
-	static Creature whatsit;
-	static FighterChar whoozit;
+	static int result;
 	
 
 	public D20setup() {
@@ -28,6 +31,7 @@ public class D20setup {
 		idcount2 = 0;
 		mapsize = 15;
 		initCounter = 0;
+		result = 0;
 		
 		
 		units1 = new Creature[5];
@@ -50,14 +54,18 @@ public class D20setup {
 		System.out.println(Arrays.toString(units1));
 		System.out.println(Arrays.toString(units2));
 		
-		for (int i = 0; i < 10; i++) {
+		while (result == 0){
 			aiCycle();
 			map = updateMap();
 			printMap();
 			System.out.println(Arrays.toString(units1));
 			System.out.println(Arrays.toString(units2));
 		}
-
+		
+		if (result == 1)
+			System.out.println("Team 1 wins!");
+		if (result == 2)
+			System.out.println("Team 2 wins!");
 	}
 	
     private static void generateInitiative() {
@@ -129,16 +137,50 @@ public class D20setup {
 
 	private static void aiCycle() {
 		for (int i = 0; i < idcountTotal; i++) {
-			if (initiative[i][1] == 1)
-			{
-				units1[initiative[i][2]].updateTargetList(units2);
-				units1[initiative[i][2]].ai();
-			}				
-			else
-			{
-				units2[initiative[i][2]].updateTargetList(units1);
-				units2[initiative[i][2]].ai();
-			}				
+			unitsRemaining1 = 0;
+			unitsRemaining2 = 0;
+			for (int j = 0; j <idcount1; j++) {
+				if(!units1[j].hasDied()){
+					unitsRemaining1++;
+				}
+			}
+			for (int j = 0; j <idcount2; j++) {
+				if(!units2[j].hasDied()){
+					unitsRemaining2++;
+				}
+			}
+			if (unitsRemaining2 == 0)
+				result = 1;
+			if (unitsRemaining1 == 0)
+				result = 2;
+			if (result == 0){
+				if (initiative[i][1] == 1)
+				{
+					targetableUnits2 = new Creature[unitsRemaining2];
+					for (int j = 0; j <idcount2; j++) {
+						if(!units2[j].hasDied()){
+							unitsRemaining2--;
+							targetableUnits2[unitsRemaining2] = units2[j];
+						}						
+					}
+					units1[initiative[i][2]].updateTargetList(targetableUnits2);
+					if (!units1[initiative[i][2]].hasDied())
+						units1[initiative[i][2]].ai();
+				}				
+				else
+				{
+					targetableUnits1 = new Creature[unitsRemaining1];
+					for (int j = 0; j <idcount1; j++) {
+						if(!units1[j].hasDied()){
+							unitsRemaining1--;
+							targetableUnits1[unitsRemaining1] = units1[j];
+						}						
+					}
+					units2[initiative[i][2]].updateTargetList(targetableUnits1);
+					if (!units2[initiative[i][2]].hasDied())
+						units2[initiative[i][2]].ai();
+				}
+			}
 		}
 	}
 }
